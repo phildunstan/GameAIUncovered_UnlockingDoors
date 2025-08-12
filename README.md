@@ -1,2 +1,2 @@
 # Doors
-Example project for a tutorial series on creating Doors that can be used by NPCs.
+Example door implementations as discussed in the Unlocking Doors chapter of an upcoming Game AI Uncovered book (coming soon in 2026).
