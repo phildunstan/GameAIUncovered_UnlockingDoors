@@ -24,17 +24,6 @@ ADoorWithNavLink::ADoorWithNavLink(const FObjectInitializer& ObjectInitializer) 
 #endif // WITH_EDITORONLY_DATA
 }
 
-void ADoorWithNavLink::PostLoad()
-{
-	Super::PostLoad();
-	
-	// if (NavLinkComponent && NavLinkComponent->IsA<UDoorNavLinkComponent>())
-	// {
-	// 	NavLinkComponent->RemoveFromRoot();
-	// 	NavLinkComponent = nullptr;
-	// }
-}
-
 void ADoorWithNavLink::PostRegisterAllComponents()
 {
 	Super::PostRegisterAllComponents();

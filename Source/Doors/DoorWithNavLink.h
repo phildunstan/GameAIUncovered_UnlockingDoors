@@ -29,8 +29,6 @@ private:
 public:
 #endif // WITH_EDITORONLY_DATA
 
-	virtual void PostLoad() override;
-	
 	virtual void PostRegisterAllComponents() override;
 	
 	virtual void BeginPlay() override;
