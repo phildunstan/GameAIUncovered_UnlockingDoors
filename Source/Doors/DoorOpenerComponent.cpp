@@ -82,33 +82,39 @@ AActor* UDoorOpenerComponent::IsApproachingDoor() const
 			// There is no more path to follow
 			return nullptr;
 
+		// Check to see if the next path segment contains a door.
+		// A door could either be implemented as either a nav link segment or a normal navmesh segment
+		// using the UDoorNavArea_Door area type.
 		const FNavPathPoint& PathPoint = PathPoints[MoveSegmentStartIndex];
 		const FNavMeshNodeFlags SegmentFlags = FNavMeshNodeFlags(PathPoint.Flags);
-		if (SegmentFlags.IsNavLink())
+		if (const ANavigationData* NavData = Cast<ANavigationData>(FNavigationSystem::GetNavDataForActor(*PathFollowingComponent->GetOwner())))
 		{
-			// we are on a nav link segment
-			const UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-			if (const INavLinkCustomInterface* MoveSegmentCustomLink = NavSys->GetCustomLink(PathPoint.CustomNavLinkId))
+			if (NavData->GetAreaClass(SegmentFlags.Area) == UDoorNavArea_Door::StaticClass())
 			{
-				if (const UActorComponent* NavLinkComponent = Cast<UActorComponent>(MoveSegmentCustomLink))
+				if (SegmentFlags.IsNavLink())
 				{
-					// if there is a door actor that is the parent of the smart link component
-					if (AActor* NavLinkOwner = NavLinkComponent->GetOwner())
+					// We've found a nav link segment
+					const UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+					if (const INavLinkCustomInterface* MoveSegmentCustomLink = NavSys->GetCustomLink(PathPoint.CustomNavLinkId))
 					{
-						if (NavLinkOwner->Implements<UDoorInterface>())
+						// Find the door actor by using the CustomNavLinkId to get the NavLinkComponent
+						if (const UActorComponent* NavLinkComponent = Cast<UActorComponent>(MoveSegmentCustomLink))
 						{
-							return NavLinkOwner;
+							if (AActor* NavLinkOwner = NavLinkComponent->GetOwner())
+							{
+								if (NavLinkOwner->Implements<UDoorInterface>())
+								{
+									return NavLinkOwner;
+								}
+							}
 						}
 					}
 				}
-			}
-		}
-		else
-		{
-			if (const ANavigationData* NavData = Cast<ANavigationData>(FNavigationSystem::GetNavDataForActor(*PathFollowingComponent->GetOwner())))
-			{
-				if (NavData->GetAreaClass(SegmentFlags.Area) == UDoorNavArea_Door::StaticClass())
+				else
 				{
+					// This could also be used to replace the logic above used when the segement is a nav link segment.
+					// I've included it separately to show that the doors manager is not needed
+					// if doors only ever use the implementation using the nav link segment when closed.
 					if (const UDoorManager* DoorsManager = GetWorld()->GetSubsystem<UDoorManager>())
 					{
 						if (ADoorWithNavLink* Door = DoorsManager->FindDoor(PathPoint.Location))
