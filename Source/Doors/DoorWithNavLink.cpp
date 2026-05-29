@@ -57,7 +57,7 @@ void ADoorWithNavLink::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 	
 	if (UDoorManager* DoorsManager = GetWorld()->GetSubsystem<UDoorManager>())
-		DoorsManager->RegisterDoor(this);
+		DoorsManager->UnregisterDoor(this);
 }
 
 bool ADoorWithNavLink::GetNavigationLinksClasses(TArray<TSubclassOf<UNavLinkDefinition>>& OutClasses) const
